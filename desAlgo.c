@@ -1,25 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <malloc.h>
 
-int count = 0;
+#define ROUNDS 16
 
 int *getExpandedMessage (char Initial_Message[9]);
 int *getExpandedKey (char Initial_Key[9]);
 int *getKeyPermutation (int Expanded_Key[64], int Key_Permutation[56]);
 int *getPermutedMessage (int initial_Permutation[64], int *Expanded_Message);
 void printArr (int *arr, int sz);
+void printHexArr (int *arr, int sz);
 void expansion_E_Table (int *Right_Message, int *Expanded_Right_message);
 void substitution (int *Right_Message, int *temp_Msg_Right);
 int getRow (int *temp_Msg_Right, int i);
 int getColumn (int *temp_Msg_Right, int i);
 void roundPermutation (int *Right_Message);
 int* Final_Permutation (int *Rounded_Message);
-
+int *getHexFromBits (int *message);
+int isTwoShiftRound (int round);
 
 int main()
 {
-	char Initial_Message[9] , Initial_Key[9] ;
+	char Initial_Message[9] , Initial_Key[9];
 	int i, j, k, round;
 	
 	
@@ -28,13 +31,32 @@ int main()
 	scanf (" %[^\n]s", Initial_Message);
 	
 	int* Expanded_Message = getExpandedMessage (Initial_Message);
+
+/*
+	int Expanded_Message [64] = { 0,0,0,0 
+	,0,0,0,1, 0,0,1,0 ,0,0,1,1 ,0,1,0,0 
+	,0,1,0,1 ,0,1,1,0, 0,1,1,1 ,1,0,0,0, 
+	1,0,0,1 ,1,0,1,0, 1,0,1,1, 1,1,0,0, 1,1,0,1 ,1,1,1,0, 1,1,1,1};
+
+*/
+	printf ("Expanded Message\n");
+	printArr (Expanded_Message, 56);
 		
 	// EXTRACTING KEY
 	printf("enter key \n ");
 	scanf(" %[^\n]s", Initial_Key);
 	
 	int* Expanded_Key = getExpandedKey (Initial_Key);
-		
+	/*
+	int Expanded_Key [64] = {0,0,0,1,0,0,1,1,
+							 0,0,1,1,0,1,0,0,
+							 0,1,0,1,0,1,1,1, 
+							 0,1,1,1,1,0,0,1, 
+							 1,0,0,1,1,0,1,1, 
+							 1,0,1,1,1,1,0,0, 
+							 1,1,0,1,1,1,1,1, 
+							 1,1,1,1,0,0,0,1};
+	*/
 	// 	Creating Key Permutation
 	int Key_Permutation[56] = 
 	{
@@ -49,6 +71,8 @@ int main()
 	};
 	
 	int* Permuted_Key = getKeyPermutation (Expanded_Key, Key_Permutation);
+	//printf ("Permuted key\n");
+	//printArr (Permuted_Key, 56);
 	
 	
 	// Divide the permuted key into 2 blocks of 28-bits each
@@ -61,6 +85,8 @@ int main()
 		else
 			Right_Key[i - 28] = Permuted_Key[i];
 	}
+	//printArr (Left_Key, 28);
+	//printArr (Right_Key, 28);
 		
 	int final_key_permutation [48] = 
 	{
@@ -78,13 +104,14 @@ int main()
 	//printArr (Left_Key, 28);
 	//printf("right arr\n");
 	//printArr (Right_Key, 28);
+	//printf("Block keys\n");
 		
 	// Create Ci and Di for 1 <= i <= 8
-	int Block_Key_Left[8][28], Block_Key_Right[8][28], temp_left, temp_right;
-	int final_Keys[8][48];
+	int Block_Key_Left[ROUNDS][28], Block_Key_Right[ROUNDS][28], temp_left, temp_right;
+	int final_Keys[ROUNDS][48];
 	
 	//Initializing Block_Key_Left & Block_Key_Right
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 1; i++)
 	{
 		for(j = 0; j < 28; j++)
 		{
@@ -93,9 +120,9 @@ int main()
 		}
 	}
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < ROUNDS; i++)
 	{
-		if (i != 0 && i != 1 )
+		if (isTwoShiftRound (i))
 		{
 			temp_left = Block_Key_Left[i][0];
 			temp_right = Block_Key_Right[i][0];
@@ -125,16 +152,31 @@ int main()
 		Block_Key_Left[i][j] = temp_left;
 		Block_Key_Right[i][j] = temp_right;
 
+		if((i+1) != ROUNDS)
+		{
+			for(j = 0; j < 28; j++)
+			{
+				Block_Key_Left [i+1][j] = Block_Key_Left[i][j];
+				Block_Key_Right [i+1][j] = Block_Key_Right[i][j];
+			}
+		}
+			
 		//printArr (Block_Key_Left[i], 28);
 		//printArr (Block_Key_Right[i], 28);
 		
 		for(k = 0; k < 48; k++)
 		{
-			if( final_key_permutation[k] < 28 )
+			if( final_key_permutation[k] <= 28 )
 				final_Keys [i][k] = Block_Key_Left [i][final_key_permutation[k] - 1];
 			else
 				final_Keys [i][k] = Block_Key_Right [i][final_key_permutation[k] - 28 - 1];
 		}
+	}
+
+	for(i = 0; i < ROUNDS; i++)
+	{
+		//printf("%d\n", i);
+		//printArr (final_Keys[i], 48);
 	}
 
 	//Initial Permutaion
@@ -151,8 +193,9 @@ int main()
 	};
 	
 	int *Permuted_Message = getPermutedMessage (Initial_Permutation, Expanded_Message);
-	printArr(Permuted_Message, 64); 
-	printf("\n--\n");
+	//printf ("Permuted msg\n");
+	//printArr(Permuted_Message, 64); 
+	//printf("\n--\n");
 
 	// Divide the permuted message into 2 blocks of 32-bits each
 	int Left_Message[32], Right_Message[32], temp_Msg_Left[32], temp_Msg_Right[48];
@@ -166,8 +209,12 @@ int main()
 			Right_Message[i - 32] = Permuted_Message[i];
 	}
 
-	for(round = 0; round < 8; round ++)
+	for(round = 0; round < ROUNDS; round ++)
 	{
+		//printf("\nS - left\n");
+		//printArr (Left_Message, 32);
+		//printf("S - Right\n");
+		//printArr (Right_Message, 32);
 		//Sture Left [i-1] & Right [i-1]
 		for (i = 0; i < 32; i++)
 		{
@@ -182,26 +229,44 @@ int main()
 
 		//Right[i] = Left[i-1] + F (Rigth[i-1], k[i])
 		//E Table
+		//printf("%d\n", round);
+		//printArr (temp_Msg_Right, 48);
 		expansion_E_Table (Right_Message, temp_Msg_Right);
+		//printf("Expanded Right\n");
+		//printArr (temp_Msg_Right, 48);
 
+		//printf("Final key \n");
+		//printArr (final_Keys[round], 48);
 		//XOR
 		for(i = 0; i < 48; i++)
 		{
 			temp_Msg_Right[i] = temp_Msg_Right[i] ^ final_Keys[round][i];
 		}
+		//printf("Xored Right\n");
+		//printArr (temp_Msg_Right, 48);
 
 		//s boxes
 		substitution (Right_Message, temp_Msg_Right);
+		//printf("S boxed Right\n");
+		//printArr (Right_Message, 32);
 
 		//permutation
 		roundPermutation (Right_Message);
+		//printf("perrmuted Right\n");
+		//printArr (Right_Message, 32);
 
 		//XOR
 		for(i = 0; i < 32; i++)
 		{
 			Right_Message[i] = Right_Message[i] ^ temp_Msg_Left[i];
 		}
+
+		//printf("left\n");
+		//printArr (Left_Message, 32);
+		//printf("Right\n");
+		//printArr (Right_Message, 32);
 	}
+	printf("\n");
 
 	int After_Round_Message [64];
 
@@ -210,25 +275,69 @@ int main()
 	for(i=0 ; i<64 ; i++)
 	{
 		if(i<32)
-		{
-			After_Round_Message[i] = Left_Message[i] ;
-		}
+			After_Round_Message[i] = Right_Message[i];
 		else
-		After_Round_Message[i] = Right_Message[i-32];
+			After_Round_Message[i] = Left_Message[i-32];
 	}
 
-
-	int *Encrypted_MEssage = Final_Permutation (After_Round_Message);
-
-	printArr (Encrypted_MEssage, 64);
+	printf("After round\n");
+	printArr (After_Round_Message, 64);
 	
 
-	free (Encrypted_MEssage);
+	int *Encrypted_Message_in_Bits = Final_Permutation (After_Round_Message);
+
+	printf("final permuted \n");
+	printArr (Encrypted_Message_in_Bits, 64);
+
+
+	int *Encrypted_Message = getHexFromBits (Encrypted_Message_in_Bits);
+
+	printf ("\nMsg\n");
+	printHexArr (Encrypted_Message, 16);
+
+	//printf ("Answer - %s\n", Encrypted_Message);
+	
+
+	free (Encrypted_Message);
+	free (Encrypted_Message_in_Bits);
 	free (Expanded_Message);
 	free (Expanded_Key);
 	free (Permuted_Key);
 	free (Permuted_Message);
 	return 0;
+}
+
+int *getHexFromBits (int *message)
+{
+	int *Encrypted_Message = (int *)malloc (sizeof(int) * 16);
+	int radix_2 = 1, i, j = 0, hex, msgIdx = 0;
+
+	//printf("\nHEX\n");
+
+	for(i = 0; i < 64; i += 4)
+	{
+		j = 3;
+		hex = 0;
+		radix_2 = 1;
+		while (j >= 0)
+		{
+			hex += message[i+j] * radix_2;
+			radix_2 *= 2;
+			j--;
+		}
+
+		//printf ("%d ", hex);
+		Encrypted_Message[msgIdx++] = hex;
+	}
+
+	return Encrypted_Message;
+}
+
+int isTwoShiftRound (int round)
+{
+	if(round == 0 || round == 1 || round == 8 || round == 15)
+		return 0;
+	return 1;
 }
 
 void expansion_E_Table (int *Right_Message, int *Expanded_Right_message)
@@ -306,14 +415,18 @@ void substitution (int *Right_Message, int *temp_Msg_Right)
 			2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
 		}
 	};
-
+	//printf("in s box\n");
 	j = 0;
 	for(i = 0; i < 48; i += 6)
 	{
 		row = getRow (temp_Msg_Right, i);
 		col = getColumn (temp_Msg_Right, i);
 
+		//printf ("r - %d\n", row);
+		//printf ("c - %d\n", col);
+
 		int_16 = S_Boxes [(i / 6)][row*16 + col];
+		//printf("got - %d\n", int_16);
 
 		extractMSB = 3;
 		while (extractMSB >= 0)
@@ -330,12 +443,12 @@ void substitution (int *Right_Message, int *temp_Msg_Right)
 
 int getRow (int *temp_Msg_Right, int i)
 {
-	return ( 2 * temp_Msg_Right[i] + temp_Msg_Right[i+5] );
+	return ( 2*temp_Msg_Right[i] + temp_Msg_Right[i+5] );
 }
 
 int getColumn (int *temp_Msg_Right, int i)
 {
-	return ( 8 * temp_Msg_Right[i+1] + 4 * temp_Msg_Right[i+2] + 2 * temp_Msg_Right[i+3] + temp_Msg_Right[i+4] );
+	return ( 8*temp_Msg_Right[i+1] + 4*temp_Msg_Right[i+2] + 2*temp_Msg_Right[i+3] + temp_Msg_Right[i+4] );
 }
 
 
@@ -412,8 +525,33 @@ void printArr (int *arr, int sz)
 	int i;
 	for(i = 0; i < sz; i++)
 	{
-		printf("%d ", arr[i]);
+		printf("%d", arr[i]);
 	}
+	printf("\n");
+	printf("\n");
+}
+
+void printHexArr (int *arr, int sz)
+{
+	int i;
+	for(i = 0; i < sz; i++)
+	{
+		if(arr[i] == 10)
+			printf("A ");
+		else if(arr[i] == 11)
+			printf("B ");
+		else if(arr[i] == 12)
+			printf("C ");
+		else if(arr[i] == 13)
+			printf("D ");
+		else if(arr[i] == 14)
+			printf("E ");
+		else if(arr[i] == 15)
+			printf("F ");
+		else
+			printf("%d ", arr[i]);
+	}
+	printf("\n");
 	printf("\n");
 }
 
@@ -436,7 +574,7 @@ int* getExpandedMessage (char Initial_Message[9])
 			j--;
 		}
 	}
-	
+	/*
 	printf ("k = %d\n", k);
 	for (i = 0; i < 64; i++)
 	{
@@ -445,7 +583,7 @@ int* getExpandedMessage (char Initial_Message[9])
 		printf ("%d ", Expanded_Message[i]);
 	}
 	printf ("\n");
-
+*/
 	return Expanded_Message;
 }
 
@@ -468,7 +606,7 @@ int *getExpandedKey (char Initial_Key[9])
 			j--;
 		}
 	}
-	
+	/*
 	printf ("k = %d\n", k);
 	for (i = 0; i < 64; i++)
 	{
@@ -477,7 +615,7 @@ int *getExpandedKey (char Initial_Key[9])
 		printf ("%d ", Expanded_Key[i]);
 	}
 	printf ("\n");
-
+*/
 	return Expanded_Key;	
 }
 
@@ -488,7 +626,7 @@ int *getKeyPermutation (int Expanded_Key[64], int Key_Permutation[56])
 		
 	for (i = 0; i < 56; i++)
 		Permuted_Key[i] = Expanded_Key[Key_Permutation[i] - 1];
-	
+	/*
 	for (i = 0; i < 56; i++)
 	{
 		if (i % 7 == 0)
@@ -496,7 +634,7 @@ int *getKeyPermutation (int Expanded_Key[64], int Key_Permutation[56])
 		printf ("%d ", Permuted_Key[i]);
 	}
 	printf ("\n");
-
+*/
 	return Permuted_Key;
 }
 

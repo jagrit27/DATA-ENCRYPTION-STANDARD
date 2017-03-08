@@ -19,6 +19,7 @@ void roundPermutation (int *Right_Message);
 int* Final_Permutation (int *Rounded_Message);
 int *getHexFromBits (int *message);
 int isTwoShiftRound (int round);
+<<<<<<< HEAD:desAlgo.c
 void desAlgo(char Initial_Message[9] ,char Initial_Key[9]);
 char *getStringFromBits (int *message);
 void writeToFile (char *message);
@@ -63,9 +64,15 @@ int main ()
     fclose(fp);
     return 0;
 }
+=======
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 
 void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 {
+<<<<<<< HEAD:desAlgo.c
+=======
+	char Initial_Message[9] , Initial_Key[9];
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	int i, j, k, round;
 
     /*
@@ -76,6 +83,7 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	int* Expanded_Message = getExpandedMessage (Initial_Message);
 
 /*
+<<<<<<< HEAD:desAlgo.c
 	int Expanded_Message [64] = { 0,0,0,0
 	,0,0,0,1, 0,0,1,0 ,0,0,1,1 ,0,1,0,0
 	,0,1,0,1 ,0,1,1,0, 0,1,1,1 ,1,0,0,0,
@@ -85,15 +93,38 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	// ("Expanded Message\n");
 	//printArr (Expanded_Message, 56);
 
+=======
+	int Expanded_Message [64] = { 0,0,0,0 
+	,0,0,0,1, 0,0,1,0 ,0,0,1,1 ,0,1,0,0 
+	,0,1,0,1 ,0,1,1,0, 0,1,1,1 ,1,0,0,0, 
+	1,0,0,1 ,1,0,1,0, 1,0,1,1, 1,1,0,0, 1,1,0,1 ,1,1,1,0, 1,1,1,1};
+
+*/
+	printf ("Expanded Message\n");
+	printArr (Expanded_Message, 56);
+		
+	// EXTRACTING KEY
+	printf("enter key \n ");
+	scanf(" %[^\n]s", Initial_Key);
+	
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	int* Expanded_Key = getExpandedKey (Initial_Key);
 	/*
 	int Expanded_Key [64] = {0,0,0,1,0,0,1,1,
 							 0,0,1,1,0,1,0,0,
+<<<<<<< HEAD:desAlgo.c
 							 0,1,0,1,0,1,1,1,
 							 0,1,1,1,1,0,0,1,
 							 1,0,0,1,1,0,1,1,
 							 1,0,1,1,1,1,0,0,
 							 1,1,0,1,1,1,1,1,
+=======
+							 0,1,0,1,0,1,1,1, 
+							 0,1,1,1,1,0,0,1, 
+							 1,0,0,1,1,0,1,1, 
+							 1,0,1,1,1,1,0,0, 
+							 1,1,0,1,1,1,1,1, 
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 							 1,1,1,1,0,0,0,1};
 	*/
 	// 	Creating Key Permutation
@@ -112,8 +143,13 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	int* Permuted_Key = getKeyPermutation (Expanded_Key, Key_Permutation);
 	//printf ("Permuted key\n");
 	//printArr (Permuted_Key, 56);
+<<<<<<< HEAD:desAlgo.c
 
 
+=======
+	
+	
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	// Divide the permuted key into 2 blocks of 28-bits each
 	int Left_Key[28], Right_Key[28];
 
@@ -126,8 +162,13 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	}
 	//printArr (Left_Key, 28);
 	//printArr (Right_Key, 28);
+<<<<<<< HEAD:desAlgo.c
 
 	int final_key_permutation [48] =
+=======
+		
+	int final_key_permutation [48] = 
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	{
 		14,    17,   11,    24,     1,    5,
 		3,     28,   15,     6,    21,   10,
@@ -144,11 +185,19 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	//printf("right arr\n");
 	//printArr (Right_Key, 28);
 	//printf("Block keys\n");
+<<<<<<< HEAD:desAlgo.c
 
 	// Create Ci and Di for 1 <= i <= 8
 	int Block_Key_Left[ROUNDS][28], Block_Key_Right[ROUNDS][28], temp_left, temp_right;
 	int final_Keys[ROUNDS][48];
 
+=======
+		
+	// Create Ci and Di for 1 <= i <= 8
+	int Block_Key_Left[ROUNDS][28], Block_Key_Right[ROUNDS][28], temp_left, temp_right;
+	int final_Keys[ROUNDS][48];
+	
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	//Initializing Block_Key_Left & Block_Key_Right
 	for(i = 0; i < 1; i++)
 	{
@@ -199,7 +248,11 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 				Block_Key_Right [i+1][j] = Block_Key_Right[i][j];
 			}
 		}
+<<<<<<< HEAD:desAlgo.c
 
+=======
+			
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 		//printArr (Block_Key_Left[i], 28);
 		//printArr (Block_Key_Right[i], 28);
 
@@ -233,7 +286,11 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 
 	int *Permuted_Message = getPermutedMessage (Initial_Permutation, Expanded_Message);
 	//printf ("Permuted msg\n");
+<<<<<<< HEAD:desAlgo.c
 	//printArr(Permuted_Message, 64);
+=======
+	//printArr(Permuted_Message, 64); 
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	//printf("\n--\n");
 
 	// Divide the permuted message into 2 blocks of 32-bits each
@@ -305,7 +362,11 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 		//printf("Right\n");
 		//printArr (Right_Message, 32);
 	}
+<<<<<<< HEAD:desAlgo.c
 	//printf("\n");
+=======
+	printf("\n");
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 
 	int After_Round_Message [64];
 
@@ -319,6 +380,7 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 			After_Round_Message[i] = Left_Message[i-32];
 	}
 
+<<<<<<< HEAD:desAlgo.c
 	//printf("After round\n");
 	//printArr (After_Round_Message, 64);
 
@@ -340,6 +402,26 @@ void desAlgo(char Initial_Message[9] ,char Initial_Key[9])
 	//printf ("Answer - %s\n", Encrypted_Message);
 
 
+=======
+	printf("After round\n");
+	printArr (After_Round_Message, 64);
+	
+
+	int *Encrypted_Message_in_Bits = Final_Permutation (After_Round_Message);
+
+	printf("final permuted \n");
+	printArr (Encrypted_Message_in_Bits, 64);
+
+
+	int *Encrypted_Message = getHexFromBits (Encrypted_Message_in_Bits);
+
+	printf ("\nMsg\n");
+	printHexArr (Encrypted_Message, 16);
+
+	//printf ("Answer - %s\n", Encrypted_Message);
+	
+
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 	free (Encrypted_Message);
 	free (Encrypted_Message_in_Bits);
 	free (Expanded_Message);
@@ -411,6 +493,39 @@ char *getStringFromBits (int *message)
 		Encrypted_Message[msgIdx++] = ch;
 	}
 	Encrypted_Message[msgIdx] = '\0';
+
+	return Encrypted_Message;
+}
+
+int isTwoShiftRound (int round)
+{
+	if(round == 0 || round == 1 || round == 8 || round == 15)
+		return 0;
+	return 1;
+}
+
+int *getHexFromBits (int *message)
+{
+	int *Encrypted_Message = (int *)malloc (sizeof(int) * 16);
+	int radix_2 = 1, i, j = 0, hex, msgIdx = 0;
+
+	//printf("\nHEX\n");
+
+	for(i = 0; i < 64; i += 4)
+	{
+		j = 3;
+		hex = 0;
+		radix_2 = 1;
+		while (j >= 0)
+		{
+			hex += message[i+j] * radix_2;
+			radix_2 *= 2;
+			j--;
+		}
+
+		//printf ("%d ", hex);
+		Encrypted_Message[msgIdx++] = hex;
+	}
 
 	return Encrypted_Message;
 }
@@ -633,7 +748,12 @@ void printHexArr (int *arr, int sz)
 		else
 			printf("%d ", arr[i]);
 	}
+<<<<<<< HEAD:desAlgo.c
     printf("\n");
+=======
+	printf("\n");
+	printf("\n");
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 }
 
 int* getExpandedMessage (char Initial_Message[9])
@@ -697,7 +817,11 @@ int *getExpandedKey (char Initial_Key[9])
 	}
 	printf ("\n");
 */
+<<<<<<< HEAD:desAlgo.c
 	return Expanded_Key;
+=======
+	return Expanded_Key;	
+>>>>>>> edc1f36beeff20d6a5894a82ebd3ccfec9bbc95f:desAlgo.c
 }
 
 int *getKeyPermutation (int Expanded_Key[64], int Key_Permutation[56])
